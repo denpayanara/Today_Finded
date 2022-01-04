@@ -56,7 +56,7 @@ if len(df1) > 0:
     fig.layout.title.font.size = 10
 
     # scale=10だとツイート時に400 Bad Request
-    fig.write_image('data/today_finded.png', engine='kaleido', scale=2)
+    fig.write_image('data/today_finded.png', engine='kaleido', scale=1)
 
     count_dic = df1['市区町村名'].value_counts().to_dict()
 
