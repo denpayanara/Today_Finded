@@ -83,7 +83,7 @@ if len(df1) > 0:
 
     media_ids = []
 
-    res_media_ids = api.media_upload("data/today_finded.png")
+    res_media_ids = api.media_upload('data/today_finded.png')
 
     media_ids.append(res_media_ids.media_id)
 
