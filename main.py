@@ -7,8 +7,7 @@ import plotly.figure_factory as ff
 import tweepy
 
 # 今日の日付を取得
-DIFF_JST_FROM_UTC = 9
-now = datetime.datetime.utcnow() + datetime.timedelta(hours=DIFF_JST_FROM_UTC)
+now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
 today = now.date()
 
 # スプレッドシート読み込み
@@ -16,25 +15,38 @@ url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5yTYaZX7YOA0bTx_DYShEVC
 
 df = pd.read_csv(url).fillna("")
 
-# 「確認日」の列をdatetime型に変換
+# df['確認日']をdatetime型に変換
 df['確認日'] = pd.to_datetime( df['確認日'], format = '%Y/%m/%d', errors='coerce')
 
+# df['確認日']から今日のデータを抽出
 df1 = df[df["確認日"] == pd.Timestamp(today)]
+
+# df['所在地']から市区町村名を抽出する関数
+def get_prefectures(address):
+
+    pattern = '奈良市|大和高田市|大和郡山市|天理市|橿原市|桜井市|五條市|御所市|生駒市|香芝市|葛城市|宇陀市|山添村|平群町|三郷町|斑鳩町|安堵町|川西町|三宅町|田原本町|曽爾村|御杖村|高取町|明日香村|上牧町|王寺町|広陵町|河合町|吉野町|大淀町|下市町|黒滝村|天川村|野迫川村|十津川村|下北山村|上北山村|川上村|東吉野村'
+
+    m = re.match(pattern, address)
+
+    if m:
+        return m.group()
+    else:
+        return address
+
+# df['開局状況']の値を置換する為の辞書
+df_replace = {
+    'OK': '開局',
+    'NG': '未開局',
+    'OK(仮)': '開局(仮)',
+    'OK(未知局)': '開局(未知局)',
+    'NG(仮)': '未開局(仮)',
+}
 
 if len(df1) > 0:
 
-    def get_prefectures(address):
+    df1['市区町村名'] = df1['所在地'].apply(get_prefectures)
 
-        pattern = '奈良市|大和高田市|大和郡山市|天理市|橿原市|桜井市|五條市|御所市|生駒市|香芝市|葛城市|宇陀市|山添村|平群町|三郷町|斑鳩町|安堵町|川西町|三宅町|田原本町|曽爾村|御杖村|高取町|明日香村|上牧町|王寺町|広陵町|河合町|吉野町|大淀町|下市町|黒滝村|天川村|野迫川村|十津川村|下北山村|上北山村|川上村|東吉野村'
-
-        m = re.match(pattern, address)
-
-        if m:
-            return m.group()
-        else:
-            return address
-
-    df1['市区町村名'] = df['所在地'].apply(get_prefectures)
+    df1['開局状況'] = df1['開局状況'].replace(df_replace)
 
     df2 = df1[['名称', '開局状況']]
 
