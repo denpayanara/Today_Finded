@@ -92,6 +92,7 @@ if len(df1) > 0:
     auth.set_access_token(access_token, access_token_secret)
 
     api = tweepy.API(auth)
+    client = tweepy.Client(consumer_key = api_key, consumer_secret = api_secret, access_token = access_token, access_token_secret = access_token_secret,)
 
     media_ids = []
 
@@ -99,4 +100,4 @@ if len(df1) > 0:
 
     media_ids.append(res_media_ids.media_id)
 
-    api.update_status(status = tweet, media_ids = media_ids)
+    client.create_tweet(text = tweet, media_ids=media_ids)
